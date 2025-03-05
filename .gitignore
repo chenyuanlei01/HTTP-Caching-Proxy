@@ -1,7 +1,6 @@
 # Build files
 *.o
 *.out
-proxy
 
 # IDE specific files
 .vscode/*

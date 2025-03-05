@@ -80,18 +80,6 @@ For testing the web proxy with a browser, **Firefox** is recommended for its str
 - Mutex locks for logging
 - RAII-style lock guards to prevent deadlocks
 
-<!-- ## 📁 Project Structure
-
-- `main.cpp`: Entry point and server initialization
-- `socket.hpp/cpp`: Socket abstraction layer
-- `handler.hpp/cpp`: Request handling and processing
-- `cache.hpp/cpp`: LRU caching implementation
-- `request.hpp/cpp`: HTTP request parsing
-- `response.hpp/cpp`: HTTP response parsing
-- `log.hpp/cpp`: Thread-safe logging
-- `utils/locks.hpp`: Synchronization primitives -->
-
-
 ## 👥 Contributors
 
 Current Maintainers: Chenyuan Lei and Ankit Raj
