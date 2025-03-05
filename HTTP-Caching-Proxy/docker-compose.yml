@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  proxy:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    ports:
+      # Map the container port to the host port
+      # Adjust these ports based on your proxy configuration
+      - "12345:12345"
+    volumes:
+      # Mount logs directory for persistent logging
+      - ./proxy/logs:/var/log/erss
+    restart: unless-stopped
+    container_name: proxy
+    # For better container identification
+    hostname: proxy
+    # If your proxy needs specific environment variables, add them here
+    # environment:
+    #   - KEY=value 

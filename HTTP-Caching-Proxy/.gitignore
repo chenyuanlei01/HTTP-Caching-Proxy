@@ -1,0 +1,42 @@
+# Build files
+*.o
+*.out
+
+# IDE specific files
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+*.swp
+*.swo
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Debug files
+*.dSYM/
+
+# Log files
+*.log
+proxy.log
+
+# Dependencies
+/lib/
+/vendor/
+
+# CMake build directory
+build/
+CMakeFiles/
+CMakeCache.txt
+
+# Temporary files
+*.tmp
+*~
+
+# Core dumps
+core 
+
+# documentation
+danger_log.txt
