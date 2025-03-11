@@ -11,7 +11,7 @@
 Sample POST Request:
 
 POST /submit-form HTTP/1.1
-Host: example.com:8080
+Host: example.com:80
 User-Agent: TestAgent/1.0
 Content-Type: application/json
 Content-Length: 47

@@ -82,7 +82,7 @@ For testing the web proxy with a browser, **Firefox** is recommended for its str
 
 ## 👥 Contributors
 
-Current Maintainers: Chenyuan Lei and Ankit Raj
+Current Maintainers: Chenyuan Lei
 
 ## 📄 License
 
