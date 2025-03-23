@@ -11,7 +11,7 @@ OBJS = $(SRCS:.cpp=.o)
 INCLUDES = -I/usr/include/boost
 
 # Libraries
-LIBS = -lboost_system
+LIBS = -lboost_system -lboost_thread -pthread
 
 # Default target
 all: $(TARGET)

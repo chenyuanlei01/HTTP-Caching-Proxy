@@ -8,8 +8,13 @@
 #include <poll.h>
 #include <algorithm>
 #include <fcntl.h>
+#include <boost/asio/thread_pool.hpp>
+#include <boost/asio/post.hpp>
+#include <thread>
 
 using namespace std;
+
+extern boost::asio::thread_pool * global_thread_pool;
 
 // Initialize the global logger and cache
 Log* proxy_logger = nullptr; 
@@ -70,6 +75,24 @@ bool Handler::create_connection_thread(std::shared_ptr<ISocket> client_socket, s
         return false;
     }
     pthread_detach(thread);
+    return true;
+}
+
+bool Handler::post_thread_pool(std::shared_ptr<ISocket> client_socket, string id) {
+    if (global_thread_pool == nullptr) {
+        cerr << "[Error] Thread pool not initialized" << endl;
+        if (proxy_logger) proxy_logger->write("(no-id): ERROR Thread pool not initialized");
+        return false;
+    }
+    
+    ThreadData *thread_data = new ThreadData();
+    thread_data->client_socket = client_socket;
+    thread_data->id = id;
+
+    boost::asio::post(*global_thread_pool, [thread_data]() {
+        handle_connection(thread_data);
+    });
+    
     return true;
 }
 
@@ -506,20 +529,20 @@ bool Handler::tunnelTraffic(int client_fd, int server_fd, const string& id) {
     // Set both sockets to non-blocking mode
     int client_flags = fcntl(client_fd, F_GETFL, 0);
     int server_flags = fcntl(server_fd, F_GETFL, 0);
-    fcntl(client_fd, F_SETFL, client_flags | O_NONBLOCK);
-    fcntl(server_fd, F_SETFL, server_flags | O_NONBLOCK);
+    fcntl(client_fd, F_SETFL, client_flags | O_NONBLOCK); // 让client_fd变成非阻塞的
+    fcntl(server_fd, F_SETFL, server_flags | O_NONBLOCK); // 让server_fd变成非阻塞的
     
-    int flag = 1;
+    int flag = 1; // 关闭 Nagle 算法，使小包数据立即发送，不等待数据合并
     setsockopt(client_fd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(int));
     
     char buffer[BUFFER_SIZE];
     bool client_closed = false, server_closed = false;
     
-    struct pollfd poll_fds[2];
+    struct pollfd poll_fds[2];  // 创建一个pollfd结构体数组，用于监听client_fd和server_fd的可读事件
     poll_fds[0].fd = client_fd;
-    poll_fds[0].events = POLLIN;
+    poll_fds[0].events = POLLIN; // 监听POLLIN事件，即监听client_fd的可读事件
     poll_fds[1].fd = server_fd;
-    poll_fds[1].events = POLLIN;
+    poll_fds[1].events = POLLIN; // 监听POLLIN事件，即监听server_fd的可读事件
     
     while (!client_closed && !server_closed) {
         int res = poll(poll_fds, 2, 30000); // 30s timeout
@@ -535,11 +558,11 @@ bool Handler::tunnelTraffic(int client_fd, int server_fd, const string& id) {
         }
         
         // Check client -> server
-        if (poll_fds[0].revents & POLLIN) {
-            ssize_t bytes_read = recv(client_fd, buffer, BUFFER_SIZE, 0);
+        if (poll_fds[0].revents & POLLIN) { // 如果client_fd可读
+            ssize_t bytes_read = recv(client_fd, buffer, BUFFER_SIZE, 0); // 读取client_fd的数据
             
             if (bytes_read > 0) {
-                if (!sendAll(server_fd, buffer, bytes_read)) {
+                if (!sendAll(server_fd, buffer, bytes_read)) { // 发送数据到server_fd
                     server_closed = true;
                 }
             } else {
@@ -548,11 +571,11 @@ bool Handler::tunnelTraffic(int client_fd, int server_fd, const string& id) {
         }
         
         // Check server -> client
-        if (poll_fds[1].revents & POLLIN) {
-            ssize_t bytes_read = recv(server_fd, buffer, BUFFER_SIZE, 0);
+        if (poll_fds[1].revents & POLLIN) { // 如果server_fd可读
+            ssize_t bytes_read = recv(server_fd, buffer, BUFFER_SIZE, 0); // 读取server_fd的数据
             
             if (bytes_read > 0) {
-                if (!sendAll(client_fd, buffer, bytes_read)) {
+                if (!sendAll(client_fd, buffer, bytes_read)) { // 发送数据到client_fd
                     client_closed = true;
                 }
             } else {

@@ -31,6 +31,14 @@ cd HTTP-Caching-Proxy
 
 ### Using Docker
 
+0. Rebuild (optional)
+
+```bash
+sudo docker system prune -f
+sudo docker-compose build --no-cache
+sudo docker-compose up
+```
+
 1. Build and run the proxy server:
 
 ```bash

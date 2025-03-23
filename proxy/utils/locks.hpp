@@ -9,6 +9,7 @@
 namespace utils {
 
 /**
+ * Does not use in the project currently
  * ScopedLock - Generic RAII mutex wrapper that automatically releases lock when going out of scope
  */
 template <typename MutexType>
@@ -104,6 +105,7 @@ public:
 };
 
 /**
+ * Does not use in the project currently
  * ConnectionGuard - RAII socket connection management
  */
 template <typename Socket>

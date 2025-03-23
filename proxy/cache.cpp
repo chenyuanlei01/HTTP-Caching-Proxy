@@ -29,6 +29,7 @@ std::optional<CacheEntry> Cache::get(const std::string& key) const {
     utils::ReaderLock lock(cache_mutex_);
     auto it = cache_map_.find(key);
     if (it != cache_map_.end()) {
+        // TODO: update access order
         return it->second;
     }
     return std::nullopt;

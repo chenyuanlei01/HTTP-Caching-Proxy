@@ -41,6 +41,7 @@ private:
 public:
     // Create and detach a new thread for handling connection
     static bool create_connection_thread(std::shared_ptr<ISocket> client_socket, string id);
+    static bool post_thread_pool(std::shared_ptr<ISocket> client_socket, string id);
 
     // Handle client connection in a thread
     static void* handle_connection(void* arg);
